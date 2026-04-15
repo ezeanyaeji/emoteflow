@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.core.config import get_settings
-from api.core.database import connect_db, close_db
-from api.routers import auth, emotion, suggestion, dashboard, admin
+from core.config import get_settings
+from core.database import connect_db, close_db
+from routers import auth, emotion, suggestion, dashboard, admin
 
 settings = get_settings()
 
