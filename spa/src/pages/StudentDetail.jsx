@@ -16,6 +16,7 @@ import {
   Line,
 } from 'recharts';
 import api from '../api/axios';
+import Spinner from '../components/Spinner';
 
 const EMOTION_COLORS = {
   Angry: '#ef4444',
@@ -64,7 +65,7 @@ export default function StudentDetail() {
     fetchDetail();
   }, [studentId, hours]);
 
-  if (loading) return <div className="loading">Loading student data...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div className="error-page">{error}</div>;
   if (!data) return null;
 

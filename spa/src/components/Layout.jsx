@@ -1,12 +1,13 @@
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Spinner from './Spinner';
 
 export default function Layout() {
   const { user, logout, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <Spinner />;
   }
 
   if (!user) {

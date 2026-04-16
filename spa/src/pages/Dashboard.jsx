@@ -14,6 +14,7 @@ import {
   Legend,
 } from 'recharts';
 import api from '../api/axios';
+import Spinner from '../components/Spinner';
 
 const COLORS = [
   '#ef4444', // Angry (red)
@@ -66,7 +67,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) return <div className="loading">Loading dashboard...</div>;
+  if (loading) return <Spinner />;
   if (error) return <div className="error-page">{error}</div>;
   if (!summary) return null;
 

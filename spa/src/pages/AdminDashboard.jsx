@@ -14,6 +14,7 @@ import {
   Legend,
 } from 'recharts';
 import api from '../api/axios';
+import Spinner from '../components/Spinner';
 
 const ROLE_COLORS = { student: '#3b82f6', teacher: '#22c55e', admin: '#f59e0b' };
 const EMOTION_COLORS = [
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
   const updateField = (field) => (e) =>
     setTeacherForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  if (loading) return <div className="loading">Loading admin dashboard...</div>;
+  if (loading) return <Spinner />;
   if (error && !stats) return <div className="error-page">{error}</div>;
 
   const roleData = stats
