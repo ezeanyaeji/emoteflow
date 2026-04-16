@@ -16,8 +16,8 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False,       # set True in production (HTTPS)
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=_REFRESH_MAX_AGE,
         path="/api/auth",
     )
@@ -78,8 +78,8 @@ async def logout(response: Response):
     response.delete_cookie(
         key="refresh_token",
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         path="/api/auth",
     )
     return {"detail": "Logged out"}
