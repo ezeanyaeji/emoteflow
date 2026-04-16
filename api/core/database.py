@@ -1,7 +1,7 @@
 from urllib.parse import quote_plus
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from api.core.config import get_settings
+from core.config import get_settings
 
 settings = get_settings()
 

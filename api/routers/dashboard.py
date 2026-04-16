@@ -5,8 +5,8 @@ import json
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 
-from api.core.dependencies import get_teacher_or_admin
-from api.services.dashboard import get_class_emotion_summary, export_emotion_data, get_student_detail
+from core.dependencies import get_teacher_or_admin
+from services.dashboard import get_class_emotion_summary, export_emotion_data, get_student_detail
 
 router = APIRouter(prefix="/dashboard", tags=["Teacher Dashboard"])
 

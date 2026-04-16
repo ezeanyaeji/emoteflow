@@ -14,13 +14,13 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # MongoDB
-    MONGODB_HOST: str = "localhost:27017"
-    MONGODB_USER: str = ""
-    MONGODB_PASSWORD: str = ""
-    MONGODB_DB_NAME: str = "emoteflow"
+    MONGODB_HOST: str = "cluster0.bgsnb.mongodb.net"
+    MONGODB_USER: str = "node_user"
+    MONGODB_PASSWORD: str = "ScTwyXjyH8FQqvtg"
+    MONGODB_DB_NAME: str = "emoteflowDB"
 
     # JWT
-    JWT_SECRET_KEY: str = "change-me-in-production"
+    JWT_SECRET_KEY: str = "fgh58icdejuvw490klmnopqxabyz123rst67"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7

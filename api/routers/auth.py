@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, Request, Response, status, Depends
 
-from api.models.user import UserRegister, UserLogin, UserResponse, TokenResponse, UserUpdate
-from api.services.auth import register_user, authenticate_user, create_tokens, refresh_access_token
-from api.core.dependencies import get_current_user
-from api.core.config import get_settings
+from models.user import UserRegister, UserLogin, UserResponse, TokenResponse, UserUpdate
+from services.auth import register_user, authenticate_user, create_tokens, refresh_access_token
+from core.dependencies import get_current_user
+from core.config import get_settings
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -101,7 +101,7 @@ async def get_me(user: dict = Depends(get_current_user)):
 @router.patch("/me", response_model=UserResponse)
 async def update_me(data: UserUpdate, user: dict = Depends(get_current_user)):
     from bson import ObjectId
-    from api.core.database import get_db
+    from core.database import get_db
 
     db = get_db()
     update_data = data.model_dump(exclude_unset=True)

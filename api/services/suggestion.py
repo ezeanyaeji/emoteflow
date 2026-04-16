@@ -1,4 +1,4 @@
-from api.models.suggestion import Suggestion
+from models.suggestion import Suggestion
 
 # Rule-based emotion → suggestion mapping (from app_documentation.md)
 SUGGESTION_RULES: dict[str, list[Suggestion]] = {

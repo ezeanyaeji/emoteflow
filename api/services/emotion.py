@@ -3,8 +3,8 @@ import numpy as np
 import onnxruntime as ort
 from huggingface_hub import hf_hub_download
 
-from api.core.config import get_settings
-from api.models.emotion import EmotionScores
+from core.config import get_settings
+from models.emotion import EmotionScores
 
 settings = get_settings()
 

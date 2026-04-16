@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 
-from api.models.user import CreateTeacher, UserResponse, UserRole
-from api.services.auth import register_user
-from api.core.dependencies import get_admin
+from models.user import CreateTeacher, UserResponse, UserRole
+from services.auth import register_user
+from core.dependencies import get_admin
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -33,7 +33,7 @@ async def list_users(
     limit: int = Query(default=50, ge=1, le=200),
     user: dict = Depends(get_admin),
 ):
-    from api.core.database import get_db
+    from core.database import get_db
 
     db = get_db()
     query = {}
@@ -59,7 +59,7 @@ async def list_users(
 @router.delete("/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: str, user: dict = Depends(get_admin)):
     from bson import ObjectId
-    from api.core.database import get_db
+    from core.database import get_db
 
     db = get_db()
     if user_id == user["id"]:
@@ -77,5 +77,5 @@ async def admin_stats(
     hours: int = Query(default=24, ge=1, le=720),
     user: dict = Depends(get_admin),
 ):
-    from api.services.dashboard import get_admin_stats
+    from services.dashboard import get_admin_stats
     return await get_admin_stats(hours=hours)

@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 from bson import ObjectId
 
-from api.core.database import get_db
+from core.database import get_db
 
 
 async def get_class_emotion_summary(

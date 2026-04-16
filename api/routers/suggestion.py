@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Query
 from bson import ObjectId
 
-from api.core.database import get_db
-from api.core.dependencies import get_current_user
-from api.models.suggestion import Suggestion, SuggestionFeedback, SuggestionHistory, SuggestionLog
-from api.services.suggestion import get_all_suggestions_for_emotion
+from core.database import get_db
+from core.dependencies import get_current_user
+from models.suggestion import Suggestion, SuggestionFeedback, SuggestionHistory, SuggestionLog
+from services.suggestion import get_all_suggestions_for_emotion
 
 router = APIRouter(prefix="/suggestion", tags=["Suggestions"])
 

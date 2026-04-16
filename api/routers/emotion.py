@@ -4,11 +4,11 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
 from bson import ObjectId
 
-from api.core.database import get_db
-from api.core.dependencies import get_current_user
-from api.models.emotion import EmotionLog, EmotionResponse, EmotionHistory
-from api.services.emotion import predict_emotion
-from api.services.suggestion import get_suggestion_for_emotion
+from core.database import get_db
+from core.dependencies import get_current_user
+from models.emotion import EmotionLog, EmotionResponse, EmotionHistory
+from services.emotion import predict_emotion
+from services.suggestion import get_suggestion_for_emotion
 
 router = APIRouter(prefix="/emotion", tags=["Emotion Recognition"])
 

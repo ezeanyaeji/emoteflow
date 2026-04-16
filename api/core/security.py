@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-from api.core.config import get_settings
+from core.config import get_settings
 
 settings = get_settings()
 

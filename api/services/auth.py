@@ -1,8 +1,8 @@
 from bson import ObjectId
 
-from api.core.database import get_db
-from api.core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
-from api.models.user import UserRegister, UserInDB, UserRole
+from core.database import get_db
+from core.security import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
+from models.user import UserRegister, UserInDB, UserRole
 
 
 async def register_user(data: UserRegister, role: UserRole = UserRole.STUDENT) -> dict:
