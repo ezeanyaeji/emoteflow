@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-from pydantic import field_validator
 from pydantic_settings import BaseSettings
 from functools import lru_cache
 
@@ -26,15 +25,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    # CORS
-    CORS_ORIGINS: list[str] = ["http://localhost:3000", "https://emoteflow-spa.onrender.com"]
+    # CORS (comma-separated string to avoid pydantic-settings JSON parsing issues)
+    CORS_ORIGINS: str = "http://localhost:3000,https://emoteflow-spa.onrender.com"
 
-    @field_validator("CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v):
-        if isinstance(v, str):
-            return [s.strip() for s in v.split(",") if s.strip()]
-        return v
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [s.strip() for s in self.CORS_ORIGINS.split(",") if s.strip()]
 
     # Hugging Face model
     HF_REPO_ID: str = "charlykso/emoteflow-emotion-cnn"
