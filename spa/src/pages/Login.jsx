@@ -27,7 +27,7 @@ export default function Login() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <img src="/src/public/emoteflow.svg" alt="EmoteFlow" className="auth-logo" />
+        <img src="/emoteflow.svg" alt="EmoteFlow" className="auth-logo" />
         <h1>EmoteFlow</h1>
         <p className="subtitle">Student Emotion Recognition</p>
         <form onSubmit={handleSubmit}>

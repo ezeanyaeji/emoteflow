@@ -12,8 +12,10 @@ export function getAccessToken() {
 }
 
 // ── Axios instance ──────────────────────────────────────────────────────────
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true, // send httpOnly cookies
 });
@@ -41,7 +43,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
-        const { data } = await axios.post('/api/auth/refresh', null, {
+        const { data } = await axios.post(`${API_BASE}/auth/refresh`, null, {
           withCredentials: true,
         });
         setAccessToken(data.access_token);

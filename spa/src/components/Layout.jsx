@@ -17,7 +17,7 @@ export default function Layout() {
     <div className="app-layout">
       <nav className="navbar">
         <Link to="/" className="nav-brand">
-          <img src="/src/public/emoteflow.svg" alt="" className="nav-logo" />
+          <img src="/emoteflow.svg" alt="" className="nav-logo" />
           EmoteFlow
         </Link>
         <div className="nav-links">

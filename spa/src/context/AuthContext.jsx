@@ -2,6 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import api, { setAccessToken } from '../api/axios';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -11,7 +13,7 @@ export function AuthProvider({ children }) {
   // On mount, try to refresh using the httpOnly cookie (bypass interceptors)
   useEffect(() => {
     axios
-      .post('/api/auth/refresh', null, { withCredentials: true })
+      .post(`${API_BASE}/auth/refresh`, null, { withCredentials: true })
       .then(({ data }) => {
         setAccessToken(data.access_token);
         return api.get('/auth/me');
