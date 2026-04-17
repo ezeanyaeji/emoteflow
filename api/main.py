@@ -48,6 +48,6 @@ app.include_router(admin.router, prefix="/api")
 async def health_check():
     return {"status": "ok", "service": settings.APP_NAME}
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def read_root():
     return {"status": "ok", "message": "Hello from FastAPI on Render!"}
