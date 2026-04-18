@@ -1,24 +1,35 @@
 import uuid
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Request, UploadFile, status
 from bson import ObjectId
 
 from core.database import get_db
 from core.dependencies import get_current_user
+from core.rate_limit import limiter
 from models.emotion import EmotionLog, EmotionResponse, EmotionHistory
 from services.emotion import predict_emotion
 from services.suggestion import get_suggestion_for_emotion
+from services.dashboard import get_student_detail
 
 router = APIRouter(prefix="/emotion", tags=["Emotion Recognition"])
 
 
 @router.post("/predict", response_model=EmotionResponse)
+@limiter.limit("30/minute")
 async def predict(
+    request: Request,
     file: UploadFile = File(...),
     session_id: str = Query(default=None, description="Learning session ID"),
     user: dict = Depends(get_current_user),
 ):
+    # Enforce camera consent
+    if not user.get("consent_camera", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Camera consent is required before submitting emotion predictions",
+        )
+
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -92,3 +103,15 @@ async def get_history(
         logs.append(EmotionLog(**doc))
 
     return EmotionHistory(logs=logs, total=total)
+
+
+@router.get("/my-summary")
+async def my_summary(
+    hours: int = Query(default=24, ge=1, le=720),
+    user: dict = Depends(get_current_user),
+):
+    """Return the current student's own emotion analytics (distribution, timeline, recent)."""
+    result = await get_student_detail(user["id"], hours=hours)
+    if result is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No data found")
+    return result

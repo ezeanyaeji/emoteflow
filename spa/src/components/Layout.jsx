@@ -30,6 +30,14 @@ export default function Layout() {
               Emotion Capture
             </Link>
           )}
+          {user.role === 'student' && (
+            <Link
+              to="/my-history"
+              className={location.pathname === '/my-history' ? 'active' : ''}
+            >
+              My History
+            </Link>
+          )}
           {(user.role === 'teacher' || user.role === 'admin') && (
             <Link
               to="/dashboard"

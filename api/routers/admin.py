@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 
 from models.user import CreateTeacher, UserResponse, UserRole
+from models.assignment import AssignStudents, AssignmentResponse
 from services.auth import register_user
+from services.assignment import get_assigned_student_ids, assign_students
 from core.dependencies import get_admin
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -79,3 +81,40 @@ async def admin_stats(
 ):
     from services.dashboard import get_admin_stats
     return await get_admin_stats(hours=hours)
+
+
+# ── Teacher-Student Assignments (admin-managed) ──────────────────────────────
+
+@router.get("/assignments/{teacher_id}", response_model=AssignmentResponse)
+async def get_teacher_assignments(teacher_id: str, user: dict = Depends(get_admin)):
+    """Admin views which students are assigned to a teacher."""
+    ids = await get_assigned_student_ids(teacher_id)
+    student_ids = ids or []
+    return AssignmentResponse(
+        teacher_id=teacher_id,
+        student_ids=student_ids,
+        total=len(student_ids),
+    )
+
+
+@router.put("/assignments/{teacher_id}", response_model=AssignmentResponse)
+async def set_teacher_assignments(
+    teacher_id: str,
+    body: AssignStudents,
+    user: dict = Depends(get_admin),
+):
+    """Admin sets the full student list for a teacher."""
+    from core.database import get_db
+    from bson import ObjectId
+
+    db = get_db()
+    teacher = await db.users.find_one({"_id": ObjectId(teacher_id)})
+    if not teacher or teacher["role"] not in [UserRole.TEACHER.value, UserRole.ADMIN.value]:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+
+    count = await assign_students(teacher_id, body.student_ids)
+    return AssignmentResponse(
+        teacher_id=teacher_id,
+        student_ids=body.student_ids,
+        total=count,
+    )

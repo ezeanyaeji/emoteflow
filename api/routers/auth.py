@@ -4,6 +4,7 @@ from models.user import UserRegister, UserLogin, UserResponse, TokenResponse, Us
 from services.auth import register_user, authenticate_user, create_tokens, refresh_access_token
 from core.dependencies import get_current_user
 from core.config import get_settings
+from core.rate_limit import limiter
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -24,7 +25,8 @@ def _set_refresh_cookie(response: Response, refresh_token: str) -> None:
 
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def register(data: UserRegister):
+@limiter.limit("5/minute")
+async def register(request: Request, data: UserRegister):
     user = await register_user(data)
     if user is None:
         raise HTTPException(
@@ -43,7 +45,8 @@ async def register(data: UserRegister):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin, response: Response):
+@limiter.limit("10/minute")
+async def login(request: Request, data: UserLogin, response: Response):
     user = await authenticate_user(data.email, data.password)
     if user is None:
         raise HTTPException(

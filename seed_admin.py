@@ -3,12 +3,13 @@
 import asyncio
 from datetime import datetime, timezone
 
+from api.core.config import get_settings
 from api.core.database import connect_db, close_db, get_db
 from api.core.security import hash_password
 
-
-ADMIN_EMAIL = "admin@gmail.com"
-ADMIN_PASSWORD = "password"
+settings = get_settings()
+ADMIN_EMAIL = settings.ADMIN_EMAIL
+ADMIN_PASSWORD = settings.ADMIN_PASSWORD
 
 
 async def seed_admin():

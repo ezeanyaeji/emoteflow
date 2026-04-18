@@ -42,6 +42,14 @@ export default function AdminDashboard() {
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
 
+  // Teacher-student assignment state
+  const [teachers, setTeachers] = useState([]);
+  const [selectedTeacherId, setSelectedTeacherId] = useState('');
+  const [assignedIds, setAssignedIds] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
+  const [assignSearch, setAssignSearch] = useState('');
+  const [assignMsg, setAssignMsg] = useState('');
+
   const fetchStats = async () => {
     try {
       const { data } = await api.get(`/admin/stats?hours=${hours}`);
@@ -63,10 +71,57 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchTeachers = async () => {
+    try {
+      const { data } = await api.get('/admin/users?role=teacher&limit=100');
+      setTeachers(data.users || []);
+    } catch {
+      /* non-critical */
+    }
+  };
+
   useEffect(() => {
     setLoading(true);
-    Promise.all([fetchStats(), fetchUsers()]).finally(() => setLoading(false));
+    Promise.all([fetchStats(), fetchUsers(), fetchTeachers()]).finally(() =>
+      setLoading(false)
+    );
   }, [hours, roleFilter]);
+
+  // Load assigned students when a teacher is selected
+  useEffect(() => {
+    if (!selectedTeacherId) return;
+    api
+      .get(`/admin/assignments/${selectedTeacherId}`)
+      .then(({ data }) => setAssignedIds(data.student_ids || []))
+      .catch(() => setAssignedIds([]));
+  }, [selectedTeacherId]);
+
+  // Load available students for assignment search
+  useEffect(() => {
+    api
+      .get(`/assignments/available-students?search=${assignSearch}`)
+      .then(({ data }) => setAllStudents(data.students || []))
+      .catch(() => setAllStudents([]));
+  }, [assignSearch]);
+
+  const toggleAssignStudent = (id) => {
+    setAssignedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const saveAdminAssignments = async () => {
+    if (!selectedTeacherId) return;
+    setAssignMsg('');
+    try {
+      await api.put(`/admin/assignments/${selectedTeacherId}`, {
+        student_ids: assignedIds,
+      });
+      setAssignMsg('Assignments saved successfully!');
+    } catch (err) {
+      setAssignMsg(err.response?.data?.detail || 'Failed to save assignments');
+    }
+  };
 
   const handleCreateTeacher = async (e) => {
     e.preventDefault();
@@ -341,6 +396,68 @@ export default function AdminDashboard() {
           </table>
         </div>
       )}
+
+      {/* Assign Students to Teacher */}
+      <div className="admin-section">
+        <h3>Assign Students to Teacher</h3>
+        <div className="form-group" style={{ maxWidth: 360 }}>
+          <label>Select Teacher</label>
+          <select
+            value={selectedTeacherId}
+            onChange={(e) => {
+              setSelectedTeacherId(e.target.value);
+              setAssignMsg('');
+            }}
+          >
+            <option value="">-- Choose a teacher --</option>
+            {teachers.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.first_name} {t.last_name} ({t.email})
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {selectedTeacherId && (
+          <div className="assign-panel">
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="Search students by name or email..."
+                value={assignSearch}
+                onChange={(e) => setAssignSearch(e.target.value)}
+              />
+            </div>
+            {allStudents.length === 0 ? (
+              <p className="assign-empty">No students found.</p>
+            ) : (
+              <div className="assign-list">
+                {allStudents.map((s) => (
+                  <label key={s.id} className="assign-item">
+                    <input
+                      type="checkbox"
+                      checked={assignedIds.includes(s.id)}
+                      onChange={() => toggleAssignStudent(s.id)}
+                    />
+                    <span>
+                      {s.first_name} {s.last_name}
+                    </span>
+                    <span className="assign-email">{s.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            {assignMsg && (
+              <p className={assignMsg.includes('success') ? 'success' : 'error'}>
+                {assignMsg}
+              </p>
+            )}
+            <button className="btn-create" onClick={saveAdminAssignments}>
+              Save Assignments ({assignedIds.length} students)
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

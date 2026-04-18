@@ -7,6 +7,7 @@ import EmotionCapture from './pages/EmotionCapture';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import StudentDetail from './pages/StudentDetail';
+import MyHistory from './pages/MyHistory';
 
 function RoleRedirect() {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<RoleRedirect />} />
             <Route path="/capture" element={<EmotionCapture />} />
+            <Route path="/my-history" element={<MyHistory />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/student/:studentId" element={<StudentDetail />} />

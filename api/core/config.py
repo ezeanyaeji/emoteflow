@@ -13,20 +13,20 @@ class Settings(BaseSettings):
     APP_NAME: str = "EmoteFlow API"
     DEBUG: bool = False
 
-    # MongoDB
-    MONGODB_HOST: str = "cluster0.bgsnb.mongodb.net"
-    MONGODB_USER: str = "node_user"
-    MONGODB_PASSWORD: str = "ScTwyXjyH8FQqvtg"
+    # MongoDB — no defaults; must be provided via .env or environment
+    MONGODB_HOST: str
+    MONGODB_USER: str
+    MONGODB_PASSWORD: str
     MONGODB_DB_NAME: str = "emoteflowDB"
 
-    # JWT
-    JWT_SECRET_KEY: str = "fgh58icdejuvw490klmnopqxabyz123rst67"
+    # JWT — no default for secret; must be provided via .env or environment
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # CORS (comma-separated string to avoid pydantic-settings JSON parsing issues)
-    CORS_ORIGINS: str = "http://localhost:3000,https://emoteflow-spa.onrender.com"
+    CORS_ORIGINS: str = "http://localhost:3000"
 
     @property
     def cors_origins_list(self) -> list[str]:
@@ -35,6 +35,10 @@ class Settings(BaseSettings):
     # Hugging Face model
     HF_REPO_ID: str = "charlykso/emoteflow-emotion-cnn"
     ONNX_FILENAME: str = "emoteflow_model.onnx"
+
+    # Seed admin credentials
+    ADMIN_EMAIL: str = "admin@gmail.com"
+    ADMIN_PASSWORD: str = "password"
 
     model_config = {"env_file": str(_ENV_FILE), "env_file_encoding": "utf-8"}
 

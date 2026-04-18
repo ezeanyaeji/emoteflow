@@ -1,11 +1,16 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from core.config import get_settings
 from core.database import connect_db, close_db
-from routers import auth, emotion, suggestion, dashboard, admin
+from core.rate_limit import limiter
+from routers import auth, emotion, suggestion, dashboard, admin, assignment
+from services.emotion import load_model
 
 settings = get_settings()
 
@@ -14,7 +19,7 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     # Startup
     await connect_db()
-    # Model loads lazily on first /emotion/predict request
+    load_model()  # Preload ONNX model to avoid cold-start latency
     yield
     # Shutdown
     await close_db()
@@ -26,6 +31,10 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS
 app.add_middleware(
@@ -42,6 +51,7 @@ app.include_router(emotion.router, prefix="/api")
 app.include_router(suggestion.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(admin.router, prefix="/api")
+app.include_router(assignment.router, prefix="/api")
 
 
 @app.get("/health")

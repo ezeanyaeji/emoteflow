@@ -686,6 +686,56 @@ button:disabled {
   font-size: 0.875rem;
 }
 
+/* ─── Assignment Panel ────────────────────────────────────────────────────── */
+.assign-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg);
+  border-radius: var(--radius);
+}
+
+.assign-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 320px;
+  overflow-y: auto;
+  margin-bottom: 0.75rem;
+}
+
+.assign-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 0.875rem;
+}
+
+.assign-item:hover {
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.assign-item input[type='checkbox'] {
+  width: auto;
+  accent-color: var(--primary);
+}
+
+.assign-email {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.assign-empty {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 1rem 0;
+  text-align: center;
+}
+
 /* ─── Mobile Responsive ──────────────────────────────────────────────────── */
 
 /* Small tablets and large phones */

@@ -28,6 +28,7 @@ async def connect_db():
     await db.users.create_index("email", unique=True)
     await db.emotions.create_index([("user_id", 1), ("timestamp", -1)])
     await db.suggestions.create_index([("user_id", 1), ("timestamp", -1)])
+    await db.assignments.create_index([("teacher_id", 1), ("student_id", 1)], unique=True)
     print(f"Connected to MongoDB: {settings.MONGODB_DB_NAME}")
 
 

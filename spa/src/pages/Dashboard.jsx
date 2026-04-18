@@ -33,6 +33,13 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Student assignment state
+  const [showAssign, setShowAssign] = useState(false);
+  const [availableStudents, setAvailableStudents] = useState([]);
+  const [assignedIds, setAssignedIds] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [assignMsg, setAssignMsg] = useState('');
+
   const fetchSummary = async () => {
     setLoading(true);
     setError('');
@@ -46,9 +53,43 @@ export default function Dashboard() {
     }
   };
 
+  const fetchAssignments = async () => {
+    try {
+      const [{ data: assigned }, { data: available }] = await Promise.all([
+        api.get('/assignments/my-students'),
+        api.get(`/assignments/available-students?search=${searchTerm}`),
+      ]);
+      setAssignedIds(assigned.student_ids || []);
+      setAvailableStudents(available.students || []);
+    } catch (err) {
+      console.error('Failed to load assignments', err);
+    }
+  };
+
   useEffect(() => {
     fetchSummary();
   }, [hours]);
+
+  useEffect(() => {
+    if (showAssign) fetchAssignments();
+  }, [showAssign, searchTerm]);
+
+  const toggleStudent = (id) => {
+    setAssignedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const saveAssignments = async () => {
+    setAssignMsg('');
+    try {
+      await api.put('/assignments/my-students', { student_ids: assignedIds });
+      setAssignMsg('Students assigned successfully!');
+      fetchSummary();
+    } catch (err) {
+      setAssignMsg(err.response?.data?.detail || 'Failed to save assignments');
+    }
+  };
 
   const handleExport = async (format) => {
     try {
@@ -188,6 +229,59 @@ export default function Dashboard() {
           </table>
         </div>
       )}
+
+      {/* Manage My Students */}
+      <div className="admin-section">
+        <div className="section-header">
+          <h3>My Students</h3>
+          <button
+            className="btn-secondary"
+            onClick={() => setShowAssign(!showAssign)}
+          >
+            {showAssign ? 'Close' : 'Manage Students'}
+          </button>
+        </div>
+
+        {showAssign && (
+          <div className="assign-panel">
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="Search students by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            {availableStudents.length === 0 ? (
+              <p className="assign-empty">No students found.</p>
+            ) : (
+              <div className="assign-list">
+                {availableStudents.map((s) => (
+                  <label key={s.id} className="assign-item">
+                    <input
+                      type="checkbox"
+                      checked={assignedIds.includes(s.id)}
+                      onChange={() => toggleStudent(s.id)}
+                    />
+                    <span>
+                      {s.first_name} {s.last_name}
+                    </span>
+                    <span className="assign-email">{s.email}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+            {assignMsg && (
+              <p className={assignMsg.includes('success') ? 'success' : 'error'}>
+                {assignMsg}
+              </p>
+            )}
+            <button className="btn-create" onClick={saveAssignments}>
+              Save Assignments ({assignedIds.length} students)
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

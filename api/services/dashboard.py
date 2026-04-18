@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 
 from core.database import get_db
+from services.assignment import get_assigned_student_ids
 
 
 async def get_class_emotion_summary(
@@ -12,11 +13,16 @@ async def get_class_emotion_summary(
 ) -> dict:
     db = get_db()
 
-    # Get all students (teacher sees all students' data)
+    # Get all students (or only assigned students if teacher has assignments)
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
     match_stage: dict = {"timestamp": {"$gte": since}}
     if session_id:
         match_stage["session_id"] = session_id
+
+    # Scope to assigned students if the teacher has an assignment list
+    assigned_ids = await get_assigned_student_ids(teacher_id)
+    if assigned_ids is not None:
+        match_stage["user_id"] = {"$in": assigned_ids}
 
     # Aggregate emotion distribution
     pipeline = [
@@ -106,6 +112,11 @@ async def export_emotion_data(
     query: dict = {"timestamp": {"$gte": since}}
     if session_id:
         query["session_id"] = session_id
+
+    # Scope to assigned students
+    assigned_ids = await get_assigned_student_ids(teacher_id)
+    if assigned_ids is not None:
+        query["user_id"] = {"$in": assigned_ids}
 
     rows = []
     async for doc in db.emotions.find(query).sort("timestamp", 1):

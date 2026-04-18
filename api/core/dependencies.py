@@ -59,4 +59,3 @@ async def get_admin(user: dict = Depends(get_current_user)):
             detail="Admin access required",
         )
     return user
-    return user
